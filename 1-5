@@ -1,0 +1,15 @@
+package kr.ac.itschool.dao;
+
+import java.util.ArrayList;
+
+import kr.ac.itschool.entities.Customer;
+
+public interface CustomerDao {
+	public boolean  insertRow(Customer data);
+	public Customer selectRow(String code);
+	public boolean findCode(String code);
+	public ArrayList<Customer> selectAll();
+	public ArrayList<Customer> selectFind(String search);
+	public String  updateRow(Customer data);
+	public boolean  deleteRow(String id);
+}
