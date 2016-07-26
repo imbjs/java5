@@ -1,0 +1,212 @@
+package kr.ac.itschool.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import kr.ac.itschool.dao.CustomerDao;
+import kr.ac.itschool.dbpool.DBConnectionManager;
+import kr.ac.itschool.entities.Customer;
+
+public   class CustomerDaoService implements CustomerDao {
+	DBConnectionManager db= DBConnectionManager.getInstance();
+	Connection cn=null;
+	PreparedStatement ps=null;
+	ResultSet rs=null;
+
+	@Override
+	public boolean insertRow(Customer data) {
+		boolean savechk=false;
+	
+		StringBuilder sb= new StringBuilder();
+		sb.append("INSERT INTO Customer(code,shopname,shopno1,shopno2,shopno3,");
+		sb.append("shopboss,post,addr1,addr2,businesscondition,item,clerk,tel1,tel2,tel3");
+		sb.append(")values(");
+		sb.append(" '"+data.getCode()+"','"+data.getShopname()+"','"+data.getShopno1()+"',");
+		sb.append(" '"+data.getShopno2()+"','"+data.getShopno3()+"','"+data.getShopboss()+"',");
+		sb.append(" '"+data.getPost()+"','"+data.getAddr1()+"','"+data.getAddr2()+"',");
+		sb.append(" '"+data.getBusinesscondition()+"','"+data.getItem()+"','"+data.getClerk()+"',");
+		sb.append(" '"+data.getTel1()+"','"+data.getTel2()+"','"+data.getTel3()+"')");
+		String sql=sb.toString();
+		System.out.println(sql);
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			ps.execute();
+			savechk=true;
+			System.out.println(savechk);
+			cn.close();
+			ps.close();
+			rs.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return savechk;
+	}
+
+	@Override
+	public boolean findCode(String code) {
+		String sql="SELECT id from Customer where id='"+code+"' ";
+		boolean findcode=false;	
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			if(rs.next()){
+				findcode=true;
+			}
+			cn.close();
+			ps.close();
+			rs.close();
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return findcode;
+	}
+	@Override
+	public ArrayList<Customer> selectAll() {
+		ArrayList<Customer> list=new ArrayList<Customer>();
+		Customer data=null;
+		String sql=" SELECT * from customer";
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			while(rs.next()){
+				data=new Customer();
+				data.setCode(rs.getString("code"));
+				data.setShopname(rs.getString("shopname"));
+				data.setShopno1(rs.getString("shopno1"));
+				data.setShopno2(rs.getString("shopno2"));
+				data.setShopno3(rs.getString("shopno2"));
+				data.setShopboss(rs.getString("shopboss"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setBusinesscondition(rs.getString("businesscondition"));
+				data.setItem(rs.getString("item"));
+				data.setClerk(rs.getString("clerk"));
+				data.setTel1(rs.getString("tel1"));
+				data.setTel2(rs.getString("tel2"));
+				data.setTel3(rs.getString("tel3"));
+				list.add(data);
+				}
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return list;
+	}
+
+	@Override
+	public ArrayList<Customer> selectFind(String search) {
+		ArrayList<Customer> list=new ArrayList<Customer>();
+		Customer data=null;
+		String sql=" SELECT * from Customer where code like '%"+search+"%' OR shopname like '%"+search+"%' ";
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			while(rs.next()){
+				data=new Customer();
+				data.setCode(rs.getString("code"));
+				data.setShopname(rs.getString("shopname"));
+				data.setShopno1(rs.getString("shopno1"));
+				data.setShopno2(rs.getString("shopno2"));
+				data.setShopno3(rs.getString("shopno2"));
+				data.setShopboss(rs.getString("shopboss"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setBusinesscondition(rs.getString("businesscondition"));
+				data.setItem(rs.getString("item"));
+				data.setClerk(rs.getString("clerk"));
+				data.setTel1(rs.getString("tel1"));
+				data.setTel2(rs.getString("tel2"));
+				data.setTel3(rs.getString("tel3"));
+				list.add(data);
+				
+			}
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return list;
+	}
+
+	@Override
+	public Customer selectRow(String code) {
+		String sql="SELECT * from Customer where code='"+code+"' ";
+		Customer data= null;
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			if(rs.next()){
+				data=new Customer();
+				data.setCode(rs.getString("code"));
+				data.setShopname(rs.getString("shopname"));
+				data.setShopno1(rs.getString("shopno1"));
+				data.setShopno2(rs.getString("shopno2"));
+				data.setShopno3(rs.getString("shopno2"));
+				data.setShopboss(rs.getString("shopboss"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setBusinesscondition(rs.getString("businesscondition"));
+				data.setItem(rs.getString("item"));
+				data.setClerk(rs.getString("clerk"));
+				data.setTel1(rs.getString("tel1"));
+				data.setTel2(rs.getString("tel2"));
+				data.setTel3(rs.getString("tel3"));
+				cn.close();
+				ps.close();
+				rs.close();
+			}			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return data;
+	}
+
+	@Override
+	public String updateRow(Customer data) {
+		String result="";
+	
+		StringBuilder sb= new StringBuilder();
+		try {
+			sb.append("UPDATE Customer SET shopname='"+data.getShopname()+"',");
+			sb.append("shopno1='"+data.getShopno1()+"',shopno2='"+data.getShopno2()+"',shopno3='"+data.getShopno3()+"',shopboss='"+data.getShopboss()+"',");
+			sb.append("post='"+data.getPost()+"',addr1='"+data.getAddr1()+"',addr2='"+data.getAddr2()+"',");
+			sb.append("businesscondition='"+data.getBusinesscondition()+"',item='"+data.getItem()+"',clerk='"+data.getClerk()+"',");
+			sb.append("tel1='"+data.getTel1()+"',tel2='"+data.getTel2()+"',tel3='"+data.getTel3()+"' ");
+			sb.append(" where code='"+data.getCode()+"'");
+			String sql=sb.toString();
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			ps.execute();
+			cn.close();
+			ps.close();
+		} catch (Exception e) {
+			result =e.getMessage();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean deleteRow(String code) {
+		String sql="SELECT * from Customer where code='"+code+"' ";
+		boolean success=false;
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			ps.executeQuery();
+			success=true;
+			cn.close();
+			ps.close();
+			
+		}catch (Exception e) {
+		System.out.println("db error:"+e.getMessage());
+		}
+		return success;
+	}
+}
