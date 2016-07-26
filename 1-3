@@ -1,0 +1,104 @@
+package kr.ac.itschool.customer;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import kr.ac.itschool.entities.Customer;
+import kr.ac.itschool.service.CustomerDaoService;
+
+public class CustomerMouseListener implements MouseListener {
+	DefaultTableModel model;JTable table;JTextField code;JTextField shopname;JTextField shopno1;
+	JTextField shopno2;JTextField shopno3;JTextField shopboss;JTextField post;JTextField addr1;JTextField addr2;JTextField businesscondition;
+	JTextField item;JTextField clerk;JTextField tel1;JTextField tel2;JTextField tel3; JTextField search;
+
+	CustomerMouseListener( DefaultTableModel model,JTable table,JTextField code,JTextField shopname,JTextField shopno1,
+	JTextField shopno2,JTextField shopno3,JTextField shopboss,JTextField post,JTextField addr1,JTextField addr2,JTextField businesscondition,
+	JTextField item,JTextField clerk,JTextField tel1,JTextField tel2,JTextField tel3, JTextField search) {
+		this.model=model;
+		this.table=table;
+		this.code=code;
+		this.shopname=shopname;
+		this.shopno1=shopno1;
+		this.shopno2=shopno2;
+		this.shopno3=shopno3;
+		this.shopboss=shopboss;
+		this.post=post;
+		this.addr1=addr1;
+		this.addr2=addr2;
+		this.businesscondition=businesscondition;
+		this.item=item;
+		this.clerk=clerk;
+		this.tel1=tel1;
+		this.tel2=tel2;
+		this.tel3=tel3;
+		this.search=search;
+		
+	}
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		JTable target = (JTable) e.getSource();
+		int row=target.getSelectedRow();
+		if (row==-1){
+			JOptionPane.showMessageDialog(code,"항목을 입력하세요");
+			return;
+		}
+		String code =(String) target.getValueAt(row, 0);
+		String shopname =(String) target.getValueAt(row, 0);
+		
+		if(e.getButton()==3){
+				deleteCustomer(code,shopname,row);
+			return;
+		}
+		CustomerDaoService service=new CustomerDaoService();
+		Customer data=service.selectRow(code);
+		
+		this.code.setText(data.getCode());
+		this.shopname.setText(data.getShopname());
+		shopno1.setText(data.getShopno1());
+		shopno2.setText(data.getShopno2());
+		shopno3.setText(data.getShopno3());
+		shopboss.setText(data.getShopboss());
+		post.setText(data.getPost());
+		addr1.setText(data.getAddr1());
+		addr2.setText(data.getAddr2());
+		businesscondition.setText(data.getBusinesscondition());
+		item.setText(data.getItem());
+		clerk.setText(data.getClerk());
+		tel1.setText(data.getTel1());
+		tel2.setText(data.getTel2());
+		tel3.setText(data.getTel3());
+	
+	}
+	private void deleteCustomer(String code,String shopname, int row) {
+		System.out.println("code:"+code);
+		System.out.println("shopname:"+shopname);
+		int result=JOptionPane.showConfirmDialog(null, code+"\n"+shopname+"\n"+"do you wantto delete?" , "test spanish  " , JOptionPane.OK_CANCEL_OPTION);
+		System.out.println(result);
+		if(result==0){
+			CustomerDaoService service=new CustomerDaoService();
+			boolean success=service.deleteRow(code);
+			if(success){
+				model.removeRow(row);
+			}
+		}else{
+			return;
+		}
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+}
