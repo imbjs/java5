@@ -1,0 +1,110 @@
+package kr.ac.itschool.entities;
+
+public class Customer {
+	private String code;
+	private String shopname;
+	private String shopno1;
+	private String shopno2;
+	private String shopno3;
+	private String shopboss;
+	private String post;
+	private String addr1;
+	private String addr2;
+	private String businesscondition;
+	private String item;
+	private String clerk;
+	private String tel1;
+	private String tel2;
+	private String tel3;
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+	public String getShopname() {
+		return shopname;
+	}
+	public void setShopname(String shopname) {
+		this.shopname = shopname;
+	}
+	public String getShopno1() {
+		return shopno1;
+	}
+	public void setShopno1(String shopno1) {
+		this.shopno1 = shopno1;
+	}
+	public String getShopno2() {
+		return shopno2;
+	}
+	public void setShopno2(String shopno2) {
+		this.shopno2 = shopno2;
+	}
+	public String getShopno3() {
+		return shopno3;
+	}
+	public void setShopno3(String shopno3) {
+		this.shopno3 = shopno3;
+	}
+	public String getShopboss() {
+		return shopboss;
+	}
+	public void setShopboss(String shopboss) {
+		this.shopboss = shopboss;
+	}
+	public String getPost() {
+		return post;
+	}
+	public void setPost(String post) {
+		this.post = post;
+	}
+	public String getAddr1() {
+		return addr1;
+	}
+	public void setAddr1(String addr1) {
+		this.addr1 = addr1;
+	}
+	public String getAddr2() {
+		return addr2;
+	}
+	public void setAddr2(String addr2) {
+		this.addr2 = addr2;
+	}
+	public String getBusinesscondition() {
+		return businesscondition;
+	}
+	public void setBusinesscondition(String businesscondition) {
+		this.businesscondition = businesscondition;
+	}
+	public String getItem() {
+		return item;
+	}
+	public void setItem(String item) {
+		this.item = item;
+	}
+	public String getClerk() {
+		return clerk;
+	}
+	public void setClerk(String clerk) {
+		this.clerk = clerk;
+	}
+	public String getTel1() {
+		return tel1;
+	}
+	public void setTel1(String tel1) {
+		this.tel1 = tel1;
+	}
+	public String getTel2() {
+		return tel2;
+	}
+	public void setTel2(String tel2) {
+		this.tel2 = tel2;
+	}
+	public String getTel3() {
+		return tel3;
+	}
+	public void setTel3(String tel3) {
+		this.tel3 = tel3;
+	}
+	
+}
