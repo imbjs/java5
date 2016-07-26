@@ -1,0 +1,194 @@
+package kr.ac.itschool.customer;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import kr.ac.itschool.entities.Customer;
+import kr.ac.itschool.service.CustomerDaoService;
+
+public class CustomerActionListener implements ActionListener {
+		
+	CustomerDaoService service = new CustomerDaoService();
+	
+	boolean confirmchk;
+	DefaultTableModel model;JTable table;JTextField code;JTextField shopname;JTextField shopno1;
+	JTextField shopno2;JTextField shopno3;JTextField shopboss;JTextField post;JTextField addr1;JTextField addr2;JTextField businesscondition;
+	JTextField item;JTextField clerk;JTextField tel1;JTextField tel2;JTextField tel3; JTextField search;
+
+	
+	CustomerActionListener(boolean confirmchk,DefaultTableModel model,JTable table,JTextField code,JTextField shopname,JTextField shopno1,
+			JTextField shopno2,JTextField shopno3,JTextField shopboss,JTextField post,JTextField addr1,JTextField addr2,JTextField businesscondition,
+			JTextField item,JTextField clerk,JTextField tel1,JTextField tel2,JTextField tel3, JTextField search){
+				this.model=model;
+				this.table=table;
+				this.code=code;
+				this.shopname=shopname;
+				this.shopno1=shopno1;
+				this.shopno2=shopno2;
+				this.shopno3=shopno3;
+				this.shopboss=shopboss;
+				this.post=post;
+				this.addr1=addr1;
+				this.addr2=addr2;
+				this.businesscondition=businesscondition;
+				this.item=item;
+				this.clerk=clerk;
+				this.tel1=tel1;
+				this.tel2=tel2;
+				this.tel3=tel3;
+				this.search=search;
+					}
+
+	boolean confirmChk(){
+		boolean findcode=service.findCode(code.getText());
+		if(findcode){
+			JOptionPane.showMessageDialog(code, "Code중복입니다.");
+			code.setText("");
+			confirmchk=false;
+		}else{
+			JOptionPane.showMessageDialog(code, "사용 가능한 Code입니다.");
+			confirmchk=true;
+		}
+		return findcode;
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		String btntxt=e.getActionCommand();
+		if(btntxt.equals("중복검사")){
+			if( code.getText().equals("")) {
+				JOptionPane.showMessageDialog(code, "Code를 입력하세요.");
+				return;
+			}
+			boolean findcode =confirmChk();
+			if(findcode)
+				return;
+		}
+		Customer data=new Customer();
+		data.setCode(code.getText());
+		data.setShopname(shopname.getText());
+		data.setShopno1(shopno1.getText());
+		data.setShopno2(shopno2.getText());
+		data.setShopno3(shopno3.getText());
+		data.setShopboss(shopboss.getText());
+		data.setPost(post.getText());
+		data.setAddr1(addr1.getText());
+		data.setAddr2(addr2.getText());
+		data.setBusinesscondition(businesscondition.getText());
+		data.setItem(item.getText());
+		data.setClerk(clerk.getText());
+		data.setTel1(tel1.getText());
+		data.setTel2(tel2.getText());
+		data.setTel3(tel3.getText());
+		
+		if(btntxt.equals("입력")){
+			insertCustomer(data,btntxt);
+		}
+		if(btntxt.equals("검색")){
+			searchCustomer(search.getText());
+		}
+		if(btntxt.equals("취소")){
+			model.setRowCount(0);
+			screenClear();
+		}
+		if(btntxt.equals("수정")){
+			if( code.getText().equals("")) {
+				JOptionPane.showMessageDialog(code, "검색후 수정 항목을 선택하세요.");
+				return;
+			}
+			String before=model.getValueAt( table.getSelectedRow(), 0).toString();
+			String after= code.getText();
+			if(!before.equals(after)){
+				JOptionPane.showMessageDialog(code, "ID는 수정 할 수 없습니다.");
+				code.setText(before);
+				return;
+			}
+			updateCustomer(data);
+		}
+	}
+
+	void updateCustomer(Customer data) {
+		String result =service.updateRow(data);
+		if(result.equals("")){
+				JOptionPane.showMessageDialog(code, "수정 되었습니다.");
+				screenClear();
+				model.setValueAt(data.getShopname(),table.getSelectedRow(),1);
+				String shopno=data.getShopno1()+"-"+data.getShopno2()+"-"+data.getShopno3();
+				model.setValueAt(shopno,table.getSelectedRow(),2);
+				String phone=data.getTel1()+"-"+data.getTel2()+"-"+data.getTel3();
+				model.setValueAt(phone,table.getSelectedRow(),3);
+		}
+		else
+			JOptionPane.showMessageDialog(code,"수정되지 않았습니다.\n"+result);
+		}
+	
+	void insertCustomer(Customer data,String btntxt) {
+		String message="-입력시 체크 사항-\n\n";
+		if(!confirmchk)
+			message +="ID를 중복체크하세요! \n";
+		if (code.getText().equals("")||code.getText()==null){
+			message +="ID를 입력하세요! \n";
+		}
+		if (shopname.getText().equals("")||shopname.getText()==null){
+			message +="이름을 입력하세요! \n";
+		}
+		if(!message.equals("-입력시 체크 사항-\n\n")){
+			JOptionPane.showMessageDialog(code, message);
+			return;
+		}
+		boolean savechk2=service.insertRow(data);
+		System.out.println(savechk2);
+		if(savechk2){
+			Object row[]={"","","",""};
+			row[0]=data.getCode();
+			row[1]=data.getShopname();
+			row[2]=data.getShopno1()+"-"+data.getShopno2()+"-"+data.getShopno3();
+			row[3]=data.getTel1()+"-"+data.getTel2()+"-"+data.getTel3();
+			model.addRow(row);
+			screenClear();		
+			JOptionPane.showMessageDialog(code, "저장 되었습니다.");
+		}else{
+			JOptionPane.showMessageDialog(code, "저장 실패");
+		}
+	}
+	void searchCustomer(String search){
+		model.setRowCount(0);
+		ArrayList<Customer> list=null;
+		if(search.equals(""))
+			list=service.selectAll();
+		else
+			list=service.selectFind(search);
+		Object row[]={"","","",""};
+		for(Customer list1:list){
+			row[0]=list1.getCode();
+			row[1]=list1.getShopname();
+			row[2]=list1.getShopno1()+"-"+list1.getShopno2()+"-"+list1.getShopno3();
+			row[3]=list1.getTel1()+"-"+list1.getTel2()+"-"+list1.getTel3();
+			model.addRow(row);
+		}
+	}
+	void screenClear(){
+		code.setText("");
+		shopname.setText("");
+		shopno1.setText("");
+		shopno2.setText("");
+		shopno3.setText("");
+		shopboss.setText("");
+		post.setText("");
+		addr1.setText("");
+		addr2.setText("");
+		businesscondition.setText("");
+		item.setText("");
+		clerk.setText("");
+		tel1.setText("");
+		tel2.setText("");
+		tel3.setText("");
+		confirmchk=false;
+	}
+}
