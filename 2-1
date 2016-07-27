@@ -1,0 +1,165 @@
+package kr.ac.itschool.customer;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+public class CustomerMain {
+
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("거래처 관리");
+		boolean confirmchk=false;
+		frame.setLocation(100,100);
+		frame.setPreferredSize(new Dimension(900,500));
+		Container contentPane = frame.getContentPane();
+		GridLayout gridLayout = new GridLayout(12,3);		
+	
+		JPanel panel = new JPanel();
+		panel.setLayout(gridLayout);
+        JTextField code = new JTextField(8);
+        JTextField shopname = new JTextField(4);
+        JTextField shopno1 = new JTextField(3);
+        JTextField shopno2 = new JTextField(2);
+        JTextField shopno3 = new JTextField(5);
+        JTextField shopboss = new JTextField(10);
+        JTextField post = new JTextField(10);
+        JTextField addr1 = new JTextField(11);
+        JTextField addr2 = new JTextField(11);
+        JTextField businesscondition = new JTextField(11);
+        JTextField item = new JTextField(11);
+        JTextField clerk = new JTextField(11);
+        JTextField tel1 = new JTextField(3);
+        JTextField tel2= new JTextField(4);
+        JTextField tel3= new JTextField(4);
+
+        JPanel shopno=new JPanel();
+        shopno.add(shopno1);
+        shopno.add(new JLabel("-"));
+        shopno.add(shopno2);
+        shopno.add(new JLabel("-"));
+        shopno.add(shopno3);
+      
+        JComboBox ctel1=new JComboBox();
+        String comarr[]={"010","011","016","017","019",""};
+       ctel1.setModel(new DefaultComboBoxModel(comarr));
+              
+        JPanel paneltel = new JPanel();
+        paneltel.add(ctel1);
+        paneltel.add(new JLabel("-"));
+        paneltel.add(tel2);
+        paneltel.add(new JLabel("-"));
+        paneltel.add(tel3);
+       
+        JPanel codeserch=new JPanel();
+        JButton codeser=new JButton("중복검사");
+         codeserch.add(code);
+         codeserch.add(codeser);
+     
+         JLabel code2 =new JLabel("Code");
+        code2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(code2);
+        panel.add(codeserch);
+         JLabel shopname2 =new JLabel("상호");
+        shopname2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(shopname2);
+        panel.add(shopname);
+       JLabel shopno4 =new JLabel("사업자NO");
+        shopno4.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(shopno4);
+        panel.add(shopno);
+        JLabel shopboss2 =new JLabel("대표자");
+        shopboss2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(shopboss2);
+        panel.add(shopboss);
+        JLabel postno2 =new JLabel("우편번호");
+        postno2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(postno2);
+        panel.add(post);
+        JLabel addr3 =new JLabel("주소");
+        addr3.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(addr3);
+        panel.add(addr1);
+        JLabel addr4 =new JLabel("나머지주소");
+        addr4.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(addr4);
+        panel.add(addr2);
+        JLabel businesscondition2 =new JLabel("업태");
+        businesscondition2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(businesscondition2);
+        panel.add(businesscondition);
+        JLabel item2 =new JLabel("종목");
+        item2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(item2);
+        panel.add(item);
+        JLabel clerk2 =new JLabel("담당자");
+        clerk2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(clerk2);
+        panel.add(clerk);        
+        JLabel teltel =new JLabel("전화번호");
+        teltel.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(teltel);
+        panel.add(paneltel);
+        
+        panel.setLayout(gridLayout);
+        contentPane.add(panel, BorderLayout.WEST);
+        
+        Container contentPane2= frame.getContentPane();
+        String colNames[] = { "Code", "상호", "사업자번호","전화번호" };
+        DefaultTableModel model = new DefaultTableModel(colNames, 0);
+        JTable table = new JTable(model);   
+        JTableHeader header=table.getTableHeader();
+        header.setPreferredSize(new Dimension(100,30));
+        header.setBackground(Color.lightGray);
+        contentPane2.add(new JScrollPane(table), BorderLayout.CENTER);
+        
+        JPanel panel3 = new JPanel();
+        JButton button11 = new JButton("입력");
+        JButton button12 = new JButton("수정");
+        JButton button13 = new JButton("삭제");
+        JTextField search = new JTextField(10);
+        JButton button14 = new JButton("검색");
+        JButton button15 = new JButton("취소");
+        panel3.add(button11);
+        panel3.add(button12);
+        panel3.add(button13);
+        panel3.add(search);
+        panel3.add(button14);
+        panel3.add(button15);
+        contentPane.add(panel3, BorderLayout.SOUTH);
+       
+        
+           MouseListener mouse=new CustomerMouseListener(model, table,code,shopname,shopno1,
+	shopno2,shopno3,shopboss,post,addr1,addr2,businesscondition,item,clerk,ctel1,tel1,tel2,tel3, search);
+       table.addMouseListener(mouse);
+   
+        ActionListener listener =new CustomerActionListener(confirmchk,model, table,code,shopname,shopno1,
+    			shopno2,shopno3,shopboss,post,addr1,addr2,businesscondition,item,clerk,ctel1,tel1,tel2,tel3, search);
+       codeser.addActionListener(listener);  
+        button11.addActionListener(listener);
+        button12.addActionListener(listener);
+        button13.addActionListener(listener);
+        button14.addActionListener(listener);
+        button15.addActionListener(listener);
+       
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);   
+	}
+
+}
