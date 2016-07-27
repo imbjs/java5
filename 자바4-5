@@ -1,0 +1,511 @@
+package kr.ac.itschool.member;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;        
+class MemberGuiMain {
+    
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("이게뭐지");
+		boolean confirmchk=false;
+		frame.setLocation(200,300);
+		frame.setPreferredSize(new Dimension(700,300));
+		Container contentPane = frame.getContentPane();
+		
+		GridLayout gridLayout = new GridLayout(7,2);		
+		JPanel panel = new JPanel();
+		
+		panel.setLayout(gridLayout);
+        JTextField id = new JTextField(8);
+        JTextField name = new JTextField(4);
+        JTextField password = new JTextField(11);
+        JTextField phone1 = new JTextField(3);
+        JTextField phone2= new JTextField(4);
+        JTextField phone3= new JTextField(4);
+        JTextField post = new JTextField(11);
+        JTextField addr1 = new JTextField(11);
+        JTextField addr2 = new JTextField(11);
+     
+        JPanel paneltel = new JPanel();
+        paneltel.add(phone1);
+        paneltel.add(new JLabel("-"));
+        paneltel.add(phone2);
+        paneltel.add(new JLabel("-"));
+        paneltel.add(phone3);
+            
+       JPanel idserch=new JPanel();
+       JButton idser=new JButton("중복검사");
+       idserch.add(id);
+       idserch.add(idser);
+       
+        JLabel id2 =new JLabel("id");
+        id2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(id2);
+        panel.add(idserch);
+        JLabel pw2 =new JLabel("비밀번호");
+        pw2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(pw2);
+        panel.add(password);
+        JLabel name2 =new JLabel("이름");
+        name2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(name2);
+        panel.add(name);
+        JLabel teltel =new JLabel("전화번호");
+        teltel.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(teltel);
+        panel.add(paneltel);
+        JLabel postno2 =new JLabel("우편번호");
+        postno2.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(postno2);
+        panel.add(post);
+        JLabel addr3 =new JLabel("주소");
+        addr3.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(addr3);
+        panel.add(addr1);
+        JLabel addr4 =new JLabel("나머지주소");
+        addr4.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(addr4);
+        panel.add(addr2);
+        panel.setLayout(gridLayout);
+        contentPane.add(panel, BorderLayout.WEST);
+        
+        Container contentPane2= frame.getContentPane();
+        String colNames[] = { "ID", "이름", "전화번호" };
+        DefaultTableModel model = new DefaultTableModel(colNames, 0);
+        JTable table = new JTable(model);   
+        JTableHeader header=table.getTableHeader();
+        header.setPreferredSize(new Dimension(100,30));
+        header.setBackground(Color.lightGray);
+        contentPane2.add(new JScrollPane(table), BorderLayout.CENTER);
+        
+        JPanel panel3 = new JPanel();
+        JButton button11 = new JButton("입력");
+        JButton button12 = new JButton("수정");
+        JButton button13 = new JButton("삭제");
+        JTextField search = new JTextField(10);
+        JButton button14 = new JButton("검색");
+        JButton button15 = new JButton("취소");
+        panel3.add(button11);
+        panel3.add(button12);
+        panel3.add(button13);
+        panel3.add(search);
+        panel3.add(button14);
+        panel3.add(button15);
+        contentPane.add(panel3, BorderLayout.SOUTH);
+       
+   
+        MouseListener mouse=new MemberGuiMouseListener(model, table,id, password, name,
+    			phone1,phone2,phone3, post,	addr1,addr2);
+       table.addMouseListener(mouse);
+   
+        ActionListener listener =new MemberGuiActionListener(confirmchk,model, table,id, password, name,
+    			phone1,phone2,phone3, post,
+    			addr1,addr2, search);
+        idser.addActionListener(listener);  
+        button11.addActionListener(listener);
+        button12.addActionListener(listener);
+        button13.addActionListener(listener);
+        button14.addActionListener(listener);
+        button15.addActionListener(listener);
+        
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);        
+    }
+}
+-----------------------------------------------------------------------------------------
+package kr.ac.itschool.dao;
+
+import java.util.ArrayList;
+
+import kr.ac.itschool.entities.Member;
+
+public interface MemberDao {
+	public boolean  insertRow(Member data);
+	public Member selectRow(String id);
+	public boolean findId(String id);
+	public ArrayList<Member> selectAll();
+	public ArrayList<Member> selectFind(String search);
+	
+}
+-----------------------------------------------------------------------
+package kr.ac.itschool.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import kr.ac.itschool.custom.CustomDateFormat;
+import kr.ac.itschool.dao.MemberDao;
+import kr.ac.itschool.dbpool.DBConnectionManager;
+import kr.ac.itschool.entities.Member;
+
+public  class MemberDaoService implements MemberDao {
+	DBConnectionManager db= DBConnectionManager.getInstance();
+	Connection cn=null;
+	PreparedStatement ps=null;
+	ResultSet rs=null;
+
+	@Override
+	public boolean insertRow(Member data) {
+		boolean savechk=false;
+		String inputdate=CustomDateFormat.dateFormat();
+		StringBuilder sb= new StringBuilder();
+		sb.append("INSERT INTO member(id,name,phone1,phone2,");
+		sb.append("phone3,post,addr1,addr2,cardno,job,picture,password,inputdate");
+		sb.append(")values(");
+		sb.append(" '"+data.getId()+"','"+data.getName()+"','"+data.getPhone1()+"',");
+		sb.append(" '"+data.getPhone2()+"','"+data.getPhone3()+"','"+data.getPost()+"',");
+		sb.append(" '"+data.getAddr1()+"','"+data.getAddr2()+"','"+data.getCardno()+"',");
+		sb.append(" '"+data.getJob()+"','"+data.getPicture()+"','"+data.getPassword()+"',");
+		sb.append(" '"+inputdate+"')");
+		String sql=sb.toString();
+		System.out.println(sql);
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			ps.execute();
+			savechk=true;
+			System.out.println(savechk);
+			cn.close();
+			ps.close();
+			rs.close();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return savechk;
+	}
+
+	@Override
+	public boolean findId(String id) {
+		String sql="SELECT id from member where id='"+id+"' ";
+		boolean findid=false;	
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			if(rs.next()){
+				findid=true;
+			}
+			cn.close();
+			ps.close();
+			rs.close();
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return findid;
+	}
+	@Override
+	public ArrayList<Member> selectAll() {
+		ArrayList<Member> list=new ArrayList<Member>();
+		Member data=null;
+		String sql=" SELECT * from member";
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			while(rs.next()){
+				data=new Member();
+				data.setId(rs.getString("id"));
+				data.setName(rs.getString("name"));
+				data.setPhone1(rs.getString("phone1"));
+				data.setPhone2(rs.getString("phone2"));
+				data.setPhone3(rs.getString("phone3"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setCardno(rs.getString("cardno"));
+				data.setJob(rs.getString("job"));
+				data.setPicture(rs.getString("picture"));
+				data.setPassword(rs.getString("password"));
+				data.setInputdate(rs.getString("inputdate"));
+				list.add(data);
+			}
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return list;
+	}
+
+	@Override
+	public ArrayList<Member> selectFind(String search) {
+		ArrayList<Member> list=new ArrayList<Member>();
+		Member data=null;
+		String sql=" SELECT * from member where id like '%"+search+"%' OR name like '%"+search+"%' ";
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			while(rs.next()){
+				data=new Member();
+				data.setId(rs.getString("id"));
+				data.setName(rs.getString("name"));
+				data.setPhone1(rs.getString("phone1"));
+				data.setPhone2(rs.getString("phone2"));
+				data.setPhone3(rs.getString("phone3"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setCardno(rs.getString("cardno"));
+				data.setJob(rs.getString("job"));
+				data.setPicture(rs.getString("picture"));
+				data.setPassword(rs.getString("password"));
+				data.setInputdate(rs.getString("inputdate"));
+				list.add(data);
+			}
+		}catch (Exception e) {
+			System.out.println("db error:"+e.getMessage());
+		}
+		return list;
+	}
+
+	@Override
+	public Member selectRow(String id) {
+		String sql="SELECT * from member where id='"+id+"' ";
+		Member data= null;
+		try {
+			cn= db.getConnection();
+			ps= (PreparedStatement) cn.prepareStatement(sql);
+			rs=ps.executeQuery();
+			if(rs.next()){
+				data=new Member();
+				data.setId(rs.getString("id"));
+				data.setName(rs.getString("name"));
+				data.setPhone1(rs.getString("phone1"));
+				data.setPhone2(rs.getString("phone2"));
+				data.setPhone3(rs.getString("phone3"));
+				data.setPost(rs.getString("post"));
+				data.setAddr1(rs.getString("addr1"));
+				data.setAddr2(rs.getString("addr2"));
+				data.setCardno(rs.getString("cardno"));
+				data.setJob(rs.getString("job"));
+				data.setPicture(rs.getString("picture"));
+				data.setPassword(rs.getString("password"));
+				data.setInputdate(rs.getString("inputdate"));
+			}			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return data;
+	}
+}
+-----------------------------------------------
+package kr.ac.itschool.member;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import kr.ac.itschool.entities.Member;
+import kr.ac.itschool.service.MemberDaoService;
+
+public class MemberGuiActionListener implements ActionListener {
+	MemberDaoService service=new MemberDaoService();
+	
+	boolean confirmchk;
+	JTable table; JTextField id; JTextField name;JTextField password;
+	JTextField phone1 ;JTextField phone2;JTextField phone3; JTextField post;
+	JTextField addr1;JTextField addr2;DefaultTableModel model;JTextField search;
+
+	MemberGuiActionListener(boolean confirmchk,DefaultTableModel model,JTable table, JTextField id, JTextField password,JTextField name,
+			JTextField phone1,JTextField phone2,JTextField phone3, JTextField post,
+			JTextField addr1,JTextField addr2,JTextField search){
+				this.model=model;
+				this.table=table;
+				this.id=id;
+				this.password=password;
+				this.name=name;
+				this.phone1=phone1;
+				this.phone2=phone2;
+				this.phone3=phone3;
+				this.post=post;
+				this.addr1=addr1;
+				this.addr2=addr2;
+				this.confirmchk=confirmchk;
+				this.search=search;
+			}
+	boolean confirmChk(){
+		boolean findid=service.findId(id.getText());
+		if(findid){
+			JOptionPane.showMessageDialog(id, "ID중복입니다.");
+			id.setText("");
+			confirmchk=false;
+		}else{
+			JOptionPane.showMessageDialog(id, "사용 가능한 ID입니다.");
+			confirmchk=true;
+		}
+		return findid;
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		
+		String btntxt=e.getActionCommand();
+		if(btntxt.equals("중복검사")){
+			if( id.getText().equals("")) {
+				JOptionPane.showMessageDialog(id, "ID를 입력하세요.");
+				return;
+			}
+			boolean findid =confirmChk();
+			if(findid)
+				return;
+		}
+		
+		Member data=new Member();
+		data.setId(id.getText());
+		data.setName(name.getText());
+		data.setPassword(password.getText());
+		data.setPhone1(phone1.getText());
+		data.setPhone2(phone2.getText());
+		data.setPhone3(phone3.getText());
+		data.setPost(post.getText());
+		data.setAddr1(addr1.getText());
+		data.setAddr2(addr2.getText());
+		
+		if(btntxt.equals("입력")){
+			insertMember(data,btntxt);
+		}
+		if(btntxt.equals("검색")){
+			searchMember(search.getText());
+		}
+	}
+	void insertMember(Member data,String btntxt) {
+		String message="-입력시 체크 사항-\n\n";
+		if(!confirmchk)
+			message +="ID를 중복체크하세요! \n";
+		if (id.getText().equals("")||id.getText()==null){
+			message +="ID를 입력하세요! \n";
+		}
+		if (name.getText().equals("")||name.getText()==null){
+			message +="이름을 입력하세요! \n";
+		}
+		if(!message.equals("-입력시 체크 사항-\n\n")){
+			JOptionPane.showMessageDialog(id, message);
+			return;
+		}
+		boolean savechk2=service.insertRow(data);
+		System.out.println(savechk2);
+		if(savechk2){
+			Object row[]={"","",""};
+			row[0]=data.getId();
+			row[1]=data.getName();
+			row[2]=data.getPhone1()+"-"+data.getPhone2()+"-"+data.getPhone3();
+			model.addRow(row);
+			screenClear();		
+			JOptionPane.showMessageDialog(id, "저장 되었습니다.");
+		}else{
+			JOptionPane.showMessageDialog(id, "저장 실패");
+		}
+	}
+	void searchMember(String search){
+		model.setRowCount(0);
+		ArrayList<Member> list=null;
+		if(search.equals(""))
+			list=service.selectAll();
+		else
+			list=service.selectFind(search);
+		Object row[]={"","",""};
+		for(Member list1:list){
+			row[0]=list1.getId();
+			row[1]=list1.getName();
+			row[2]=list1.getPhone1()+"-"+list1.getPhone2()+"-"+list1.getPhone3();
+			model.addRow(row);
+		}
+	}
+	void screenClear(){
+		id.setText("");
+		password.setText("");
+		name.setText("");
+		phone1.setText("");
+		phone2.setText("");
+		phone3.setText("");
+		post.setText("");
+		addr1.setText("");
+		addr2.setText("");
+		confirmchk=false;
+	}
+}
+----------------------------------
+package kr.ac.itschool.member;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import kr.ac.itschool.entities.Member;
+import kr.ac.itschool.service.MemberDaoService;
+
+public class MemberGuiMouseListener implements MouseListener {
+	JTable table; JTextField id; JTextField name;JTextField password;
+	JTextField phone1 ;JTextField phone2;JTextField phone3; JTextField post;
+	JTextField addr1;JTextField addr2;DefaultTableModel model;
+	MemberGuiMouseListener( DefaultTableModel model,JTable table, JTextField id, JTextField password,JTextField name,
+			JTextField phone1,JTextField phone2,JTextField phone3, JTextField post,
+			JTextField addr1,JTextField addr2) {
+		this.model=model;
+		this.table=table;
+		this.id=id;
+		this.password=password;
+		this.name=name;
+		this.phone1=phone1;
+		this.phone2=phone2;
+		this.phone3=phone3;
+		this.post=post;
+		this.addr1=addr1;
+		this.addr2=addr2;
+		
+	}
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		JTable target = (JTable) e.getSource();
+		int row=target.getSelectedRow();
+		String idd =(String) target.getValueAt(row, 0);
+		MemberDaoService service=new MemberDaoService();
+		Member data=service.selectRow(idd);
+		id.setText(data.getId());
+		password.setText(data.getPassword());
+		name.setText(data.getName());
+		phone1.setText(data.getPhone1());
+		phone2.setText(data.getPhone2());
+		phone3.setText(data.getPhone3());
+		post.setText(data.getPost());
+		addr1.setText(data.getAddr1());
+		addr2.setText(data.getAddr2());
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+}
+===========================================================
